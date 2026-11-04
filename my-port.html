@@ -68,6 +68,19 @@
       font: inherit;
     }
 
+    /* Only truly interactive elements get a pointer; everything else stays plain */
+    a, button, .btn, .contact-link, .process-step, [onclick] {
+      cursor: pointer;
+    }
+
+    /* Decorative / label text shouldn't be selectable */
+    .scene-number, .eyebrow, .brand, .nav-links a, .roadmap-marker,
+    .tool-logo, .tool-car span, .process-step span, .fact span,
+    .showroom-caption, .detail-kicker, .project-number, footer,
+    .cinema-clapper, .process-dots {
+      user-select: none;
+    }
+
     h1,h2,h3 {
       font-family: Fredoka, sans-serif;
       line-height: 1.05;
@@ -224,16 +237,44 @@
     }
 
     .btn {
+      position: relative;
+      z-index: 0;
       border: 0;
       cursor: pointer;
       padding: 13px 22px;
       border-radius: 999px;
       font-weight: 600;
-      transition: transform .2s var(--ease), box-shadow .2s;
+      perspective: 300px;
+      transition: box-shadow .2s;
+    }
+
+    .btn::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      border-radius: inherit;
+      background-color: inherit;
+      filter: brightness(1.14);
+      box-shadow: inset 0 -2px 3px rgba(0,0,0,.2);
+      clip-path: inset(0 0 50% 0);
+      transform-origin: bottom center;
+      pointer-events: none;
     }
 
     .btn:hover {
-      transform: translateY(-3px) rotate(-1deg);
+      box-shadow: 0 10px 22px rgba(38,49,59,.14);
+    }
+
+    .btn:hover::before {
+      animation: clapperClap .55s cubic-bezier(.3,.8,.3,1);
+    }
+
+    @keyframes clapperClap {
+      0%   { transform: rotateX(0deg); }
+      35%  { transform: rotateX(-42deg); }
+      70%  { transform: rotateX(6deg); }
+      100% { transform: rotateX(0deg); }
     }
 
     .btn-primary {
@@ -394,7 +435,7 @@
     .facts-track { display:flex; width:max-content; gap:14px; padding:4px 10px 10px; animation:factsScreening 18s cubic-bezier(.55,.05,.45,.95) infinite; will-change:transform; }
     .facts-track:hover { animation-play-state:paused; }
     .fact { flex:0 0 205px; min-height:92px; padding:18px; display:flex; flex-direction:column; justify-content:center; background:rgba(255,255,255,.66); border:1px solid var(--border); border-radius:16px; box-shadow:0 12px 28px rgba(38,49,59,.07); transform:translateZ(0) rotateY(-3deg); transition:transform .35s ease,box-shadow .35s ease; }
-    .fact:hover { transform:translateY(-5px) rotateY(0deg); box-shadow:var(--shadow); }
+    .fact { cursor:default; }
     .fact strong { display:block; font:600 25px Fredoka; color:var(--ink); }
     .fact span { font-size:12px; color:var(--muted); }
     @keyframes factsScreening { 0%,10%{transform:translateX(0)} 25%,35%{transform:translateX(-219px)} 50%,60%{transform:translateX(-438px)} 75%,85%{transform:translateX(-657px)} 100%{transform:translateX(0)} }
@@ -430,7 +471,7 @@
     .roadmap[data-progress="2"] .roadmap-line::after { height:60%; }
     .roadmap[data-progress="3"] .roadmap-line::after { height:100%; }
     .roadmap-step { position:relative; display:grid; grid-template-columns:58px 1fr; gap:18px; margin-bottom:22px; opacity:.62; transform:translateX(0) scale(.985); transition:opacity .65s ease,transform .65s cubic-bezier(.2,.8,.2,1); }
-    .roadmap-marker { width:34px; height:34px; border-radius:50%; display:grid; place-items:center; position:relative; z-index:2; background:rgba(255,255,255,.12); border:1px solid rgba(49,121,166,.28); color:var(--muted); font:700 11px "DM Mono"; box-shadow:0 0 0 5px rgba(49,121,166,.025); backdrop-filter:blur(8px); transition:all .6s ease; }
+    .roadmap-marker { width:16px; height:16px; margin:9px; border-radius:50%; display:grid; place-items:center; position:relative; z-index:2; background:rgba(255,255,255,.12); border:1px solid rgba(49,121,166,.28); color:var(--muted); box-shadow:0 0 0 5px rgba(49,121,166,.025); backdrop-filter:blur(8px); transition:all .6s ease; }
     .roadmap-marker::after { content:""; position:absolute; inset:-5px; border:1px solid rgba(49,121,166,.38); border-radius:50%; opacity:0; }
     .roadmap-step.is-current { opacity:1; transform:translateX(5px) scale(1); }
     .roadmap-step.is-current .roadmap-marker { background:var(--gold); color:#382812; border-color:var(--gold); box-shadow:0 0 0 6px rgba(233,162,59,.13),0 0 26px rgba(233,162,59,.32); }
@@ -440,9 +481,24 @@
     .roadmap-card { padding:17px 19px; border:1px solid rgba(255,255,255,.28); border-radius:18px; background:rgba(255,255,255,.07); backdrop-filter:blur(10px); box-shadow:none; transition:transform .5s ease,background .5s ease,box-shadow .5s ease,border-color .5s ease; }
     .roadmap-step.is-current .roadmap-card { transform:translateX(4px); background:linear-gradient(110deg,rgba(233,162,59,.11),rgba(49,121,166,.055),transparent); border-color:rgba(233,162,59,.42); box-shadow:0 14px 32px rgba(38,49,59,.07); }
     .roadmap-step.is-past .roadmap-card { border-color:rgba(49,121,166,.2); }
-    .roadmap-card:hover { transform:translateX(7px); background:rgba(255,255,255,.18); box-shadow:var(--shadow); }
+    .roadmap-card { cursor:default; }
     .roadmap-card .body { margin-bottom:0; }
     @keyframes markerPulse{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.8);opacity:0}}
+
+    /* GENERIC INFO CARDS (education / awards / contact) */
+    .cards { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+    .card { padding:22px 24px; border:1px solid var(--border); border-radius:var(--radius); background:rgba(255,255,255,.55); box-shadow:var(--shadow); cursor:default; }
+    .card h3 { margin-bottom:10px; }
+    .card p { color:var(--muted); margin:0; }
+    .card p + p { margin-top:4px; }
+
+    .contact-box { cursor:default; }
+    .contact-links { display:flex; flex-wrap:wrap; gap:12px; margin-top:26px; }
+    .contact-link { display:inline-flex; align-items:center; gap:6px; padding:10px 16px; border:1px solid var(--border); border-radius:999px; background:rgba(255,255,255,.55); font:600 13px Inter; cursor:pointer; transition:transform .25s var(--ease), background .25s ease, border-color .25s ease; }
+    .contact-link:hover { transform:translateY(-3px); background:var(--paper-light); border-color:rgba(38,49,59,.22); }
+
+    .project-number { font:12px "DM Mono"; color:var(--rose); letter-spacing:.08em; margin-bottom:6px; user-select:none; }
+    .date { font:12px "DM Mono"; color:var(--blue); letter-spacing:.06em; margin-bottom:6px; user-select:none; }
 
     /* SCENE 4 — TRANSPARENT BRAND-COLOR CINEMATIC TOOLKIT */
     .tool-showroom { margin-top:30px; overflow:hidden; padding:12px 0 20px; -webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent); mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent); }
@@ -451,30 +507,36 @@
     .tool-car { --brand:#64748b; position:relative; width:174px; height:250px; flex:0 0 174px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:9px; padding:20px 14px 19px; border:1px solid color-mix(in srgb,var(--brand) 38%,transparent); border-radius:4px; color:var(--ink); background:transparent; box-shadow:inset 0 1px 0 rgba(255,255,255,.32); isolation:isolate; transition:transform .4s ease,border-color .4s ease,box-shadow .4s ease; }
     .tool-car::before { content:""; position:absolute; z-index:-1; inset:0; background:radial-gradient(ellipse at 50% 34%,color-mix(in srgb,var(--brand) 17%,transparent),transparent 57%),linear-gradient(135deg,color-mix(in srgb,var(--brand) 5%,transparent),transparent 60%); opacity:.92; }
     .tool-car::after { content:"LANGUAGE / TOOLKIT"; position:absolute; top:13px; left:10px; right:10px; font:8px "DM Mono"; letter-spacing:.12em; color:color-mix(in srgb,var(--brand) 86%,var(--muted)); text-transform:uppercase; text-align:center; }
-    .tool-car:hover { transform:translateY(-8px) scale(1.035); border-color:var(--brand); box-shadow:0 18px 38px color-mix(in srgb,var(--brand) 15%,transparent),inset 0 1px 0 rgba(255,255,255,.4); }
+    .tool-car { cursor:default; }
     .tool-logo { position:relative; z-index:1; width:96px; height:96px; display:grid; place-items:center; font-weight:900; font-size:32px; border:0; border-radius:0; background:transparent; color:var(--brand)!important; text-shadow:0 0 28px color-mix(in srgb,var(--brand) 25%,transparent); filter:drop-shadow(0 5px 14px color-mix(in srgb,var(--brand) 18%,transparent)); }
-    .tool-logo.react{font-size:56px;--brand:#61dafb}.tool-logo.angular{--brand:#dd0031;font-size:52px}.tool-logo.ts{--brand:#3178c6;font-size:37px}.tool-logo.js{--brand:#d9b900;font-size:35px}.tool-logo.rx{--brand:#b7178c}.tool-logo.ngrx{--brand:#7e57c2}.tool-logo.html{--brand:#e34f26;font-size:34px}.tool-logo.css{--brand:#1572b6;font-size:40px}.tool-logo.test{--brand:#729b1b}.tool-logo.mat{--brand:#3f51b5}
+    .tool-logo.react{font-size:56px;--brand:#61dafb}.tool-logo.angular{--brand:#dd0031;font-size:52px}.tool-logo.ts{--brand:#3178c6;font-size:37px}.tool-logo.js{--brand:#d9b900;font-size:35px}.tool-logo.rx{--brand:#b7178c}.tool-logo.ngrx{--brand:#7e57c2}.tool-logo.html{--brand:#e34f26;font-size:34px}.tool-logo.css{--brand:#1572b6;font-size:40px}.tool-logo.test{--brand:#729b1b}.tool-logo.mat{--brand:#3f51b5}.tool-logo.bs{--brand:#7952b3;font-size:30px}.tool-logo.php{--brand:#777bb4;font-size:30px}
     .tool-car:has(.tool-logo){--brand:var(--tool-color,#64748b)}
-    .tool-car:has(.angular){--brand:#dd0031}.tool-car:has(.react){--brand:#149ec0}.tool-car:has(.ts){--brand:#3178c6}.tool-car:has(.js){--brand:#d9b900}.tool-car:has(.rx){--brand:#b7178c}.tool-car:has(.ngrx){--brand:#7e57c2}.tool-car:has(.html){--brand:#e34f26}.tool-car:has(.css){--brand:#1572b6}.tool-car:has(.test){--brand:#729b1b}.tool-car:has(.mat){--brand:#3f51b5}
+    .tool-car:has(.angular){--brand:#dd0031}.tool-car:has(.react){--brand:#149ec0}.tool-car:has(.ts){--brand:#3178c6}.tool-car:has(.js){--brand:#d9b900}.tool-car:has(.rx){--brand:#b7178c}.tool-car:has(.ngrx){--brand:#7e57c2}.tool-car:has(.html){--brand:#e34f26}.tool-car:has(.css){--brand:#1572b6}.tool-car:has(.test){--brand:#729b1b}.tool-car:has(.mat){--brand:#3f51b5}.tool-car:has(.bs){--brand:#7952b3}.tool-car:has(.php){--brand:#777bb4}
     .tool-car strong { position:relative; z-index:1; font:600 18px Fredoka; text-align:center; letter-spacing:.01em; color:var(--ink); text-shadow:none; }
     .tool-car span { position:relative; z-index:1; font:9px "DM Mono"; color:var(--muted); text-transform:uppercase; letter-spacing:.14em; }
     .showroom-caption { display:flex; justify-content:space-between; gap:15px; margin-top:12px; font:10px "DM Mono"; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
     @keyframes showroomDrive { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
-    /* SCENE 5 — RESPONSIVE YOUTUBE CTA */
-    .story-link-card .btn { flex:0 1 auto; min-width:150px; }
-    .youtube-btn{display:inline-flex;align-items:center;gap:11px;max-width:100%;padding:12px 16px!important;text-align:left;white-space:normal}.youtube-btn svg{width:27px;height:27px;flex:0 0 27px;color:#ff2638}.youtube-btn span{display:flex;flex-direction:column;gap:2px;min-width:0}.youtube-btn strong{font-size:13px}.youtube-btn small{font-size:10px;opacity:.78;font-weight:400}.youtube-btn>b{margin-left:auto;font-size:16px}@media(max-width:520px){.youtube-btn{width:100%;justify-content:flex-start}.youtube-btn small{font-size:9px}}
+    /* SCENE 5 — COMPACT YOUTUBE CTA */
+    .story-link-card .btn { flex:0 0 auto; }
+    .youtube-btn { display:inline-flex; align-items:center; gap:8px; padding:11px 18px!important; font-size:14px; white-space:nowrap; }
+    .youtube-btn svg { width:17px; height:17px; flex:0 0 17px; color:#ff2638; }
+    .youtube-btn b { font-size:13px; font-weight:600; }
 
     /* SCENE 6 — ENGINEERING MINDSET ORBIT / SIGNAL FLOW */
     .interactive-process { position:relative; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:14px 0 8px; }
     .interactive-process::before { content:""; position:absolute; inset:8% 8%; border:1px dashed rgba(49,121,166,.22); border-radius:50%; pointer-events:none; animation:orbitTurn 30s linear infinite; }
     .process-step { position:relative; z-index:1; min-height:82px; border:1px solid rgba(255,255,255,.48); background:rgba(255,255,255,.055); border-radius:16px; padding:14px 13px; text-align:left; cursor:pointer; color:var(--ink); font:600 12px "DM Mono"; transition:transform .35s ease,background .35s ease,box-shadow .35s ease,border-color .35s ease; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); box-shadow:inset 0 1px 0 rgba(255,255,255,.24); animation:signalFloat 4.5s ease-in-out infinite; }
     .process-step:nth-child(2){animation-delay:.3s}.process-step:nth-child(3){animation-delay:.6s}.process-step:nth-child(4){animation-delay:.9s}.process-step:nth-child(5){animation-delay:1.2s}.process-step:nth-child(6){animation-delay:1.5s}
-    .process-step::after { content:""; position:absolute; width:7px; height:7px; border-radius:50%; right:13px; top:15px; background:var(--blue); box-shadow:0 0 0 0 rgba(49,121,166,.35); transition:box-shadow .35s ease,background .35s ease; }
+    .process-step::after { content:""; position:absolute; width:8px; height:8px; border-radius:50%; right:13px; top:15px; background:rgba(49,121,166,.3); box-shadow:0 0 0 0 rgba(49,121,166,.35); transition:box-shadow .35s ease,background .35s ease,transform .35s ease; }
+    .process-dots { display:flex; align-items:center; justify-content:center; gap:9px; margin-top:16px; }
+    .process-dots button { width:9px; height:9px; padding:0; border:0; border-radius:50%; background:rgba(49,121,166,.25); cursor:pointer; transition:transform .3s var(--ease), background .3s ease, box-shadow .3s ease; }
+    .process-dots button:hover { background:rgba(49,121,166,.5); }
+    .process-dots button.active { width:24px; border-radius:5px; background:var(--gold); box-shadow:0 0 0 4px rgba(233,162,59,.15); }
     .process-step span { display:block; font-size:9px; color:var(--rose); margin-bottom:12px; }
     .process-step:hover { transform:translateY(-5px) scale(1.02); background:rgba(255,255,255,.13); box-shadow:0 16px 34px rgba(38,49,59,.1); border-color:rgba(255,255,255,.78); }
     .process-step.active { background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(49,121,166,.09)); border-color:rgba(233,162,59,.75); transform:translateY(-4px); box-shadow:0 16px 35px rgba(38,49,59,.1),0 0 22px rgba(233,162,59,.08); }
-    .process-step.active::after { background:var(--gold); box-shadow:0 0 0 6px rgba(233,162,59,.12),0 0 18px rgba(233,162,59,.38); }
+    .process-step.active::after { background:var(--gold); transform:scale(1.25); box-shadow:0 0 0 6px rgba(233,162,59,.12),0 0 18px rgba(233,162,59,.38); }
     .process-step.active span { color:var(--gold); }
     .process-detail { position:relative; margin-top:16px; padding:22px; border-radius:22px; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.34); min-height:125px; box-shadow:0 18px 40px rgba(38,49,59,.055),inset 0 1px 0 rgba(255,255,255,.2); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); overflow:hidden; }
     .process-detail::before { content:""; position:absolute; width:150px; height:150px; right:-45px; top:-60px; border-radius:50%; background:radial-gradient(circle,rgba(49,121,166,.2),rgba(233,162,59,.08) 45%,transparent 70%); animation:detailOrb 6s ease-in-out infinite; }
@@ -602,7 +664,7 @@
     <a href="#scene-4">Toolkit</a>
     <a href="#scene-5">Storytelling</a>
     <a href="#scene-7">Contact</a>
-    <a class="resume-btn" href="assets/resume/ashoks-resume.pdf" download>Resume ↗</a>
+    <a class="resume-btn" href="assets/resume/ashoks-resume.pdf" target="_blank" rel="noopener noreferrer">Resume ↗</a>
   </div>
 </nav>
 
@@ -635,16 +697,16 @@
       <div class="facts" aria-label="Professional highlights">
         <div class="cinema-clapper" aria-hidden="true"><div class="clapper-hinge"></div><div class="clapper-board">ASHOK REDDY · CAREER CUT</div></div>
         <div class="facts-track">
-          <div class="fact fact-1"><strong>5.5+</strong><span>Years experience</span></div>
-          <div class="fact fact-2"><strong>8 → 21</strong><span>Angular modernization</span></div>
-          <div class="fact fact-3"><strong>6</strong><span>Enterprise sub-products</span></div>
-          <div class="fact fact-4"><strong>PT ↔ IN</strong><span>Porto · Bengaluru</span></div>
+          <div class="fact fact-1"><strong>6+</strong><span>Years at Impelsys</span></div>
+          <div class="fact fact-2"><strong>8 → 20</strong><span>Angular modernization</span></div>
+          <div class="fact fact-3"><strong>1.5M</strong><span>Users on LMS platforms</span></div>
+          <div class="fact fact-4"><strong>20%</strong><span>Performance increase</span></div>
         </div>
       </div>
 
       <div class="actions">
         <a class="btn btn-primary" href="#scene-5">Explore my story →</a>
-        <a class="btn btn-secondary" href="assets/resume/ashoks-resume.pdf" download>
+        <a class="btn btn-secondary" href="assets/resume/ashoks-resume.pdf" target="_blank" rel="noopener noreferrer">
           Download résumé
         </a>
       </div>
@@ -673,15 +735,16 @@
       <h2>How I got here.</h2>
 
       <p class="lead">
-        5.5+ years of turning software problems into practical,
-        maintainable frontend solutions.
+        Joined Impelsys as a trainee in December 2020 and have grown
+        through five levels in six years, turning software problems
+        into practical, maintainable frontend solutions.
       </p>
 
       <p class="body">
         My professional journey has grown from frontend development
         into enterprise engineering — working with Angular, TypeScript,
-        React, reactive programming, state management and API-driven
-        applications.
+        reactive programming (RxJS, NgRx) and REST APIs built on
+        Symfony (PHP).
       </p>
 
       <p class="body">
@@ -707,33 +770,33 @@
       <div class="roadmap" aria-label="Career roadmap" data-progress="0">
         <div class="roadmap-line"></div>
         <article class="roadmap-step is-current">
-          <div class="roadmap-marker">01</div>
+          <div class="roadmap-marker"></div>
           <div class="roadmap-card">
             <div class="date">DEC 2020 — PRESENT</div>
-            <h3>Senior Software Engineer</h3>
+            <h3>Senior Software Engineer II</h3>
             <p><strong>Impelsys India Pvt. Ltd.</strong></p>
-            <p class="body">Bengaluru, India · International Assignment: Porto, Portugal</p>
+            <p class="body">Joined as a trainee and grew through five levels in six years: Trainee → Software Engineer I, II, III → Senior Software Engineer I → Senior Software Engineer II.</p>
           </div>
         </article>
         <article class="roadmap-step">
-          <div class="roadmap-marker">02</div>
-          <div class="roadmap-card">
-            <h3>Enterprise Application Ecosystem</h3>
-            <p class="body">Six sub-products, collaborating with engineering teams typically ranging from 5–8 developers.</p>
-          </div>
-        </article>
-        <article class="roadmap-step">
-          <div class="roadmap-marker">03</div>
+          <div class="roadmap-marker"></div>
           <div class="roadmap-card">
             <h3>Angular Modernization</h3>
-            <p class="body">Contributed to the modernization journey from Angular 8 through Angular 20 and subsequently Angular 21.</p>
+            <p class="body">Led the Angular 8 → 20 migration of 100+ screens across 20+ modules — resolving dependency issues, refactoring legacy code and raising performance by 20%.</p>
           </div>
         </article>
         <article class="roadmap-step">
-          <div class="roadmap-marker">04</div>
+          <div class="roadmap-marker"></div>
           <div class="roadmap-card">
-            <h3>Engineering Leadership</h3>
-            <p class="body">Code reviews, mentoring, production investigation and collaboration across product, UX, backend and engineering teams.</p>
+            <h3>Enterprise LMS Platforms</h3>
+            <p class="body">Built modules for virtual classrooms, course creation, adaptive learning and assessments on platforms used by 1.5M people.</p>
+          </div>
+        </article>
+        <article class="roadmap-step">
+          <div class="roadmap-marker"></div>
+          <div class="roadmap-card">
+            <h3>Spec-First, AI-Assisted Delivery</h3>
+            <p class="body">Deliver through Impelsys's ADLC — spec first, approval, architecture, implementation with GitHub Copilot, review and release — contributing to a 35% revenue improvement.</p>
           </div>
         </article>
       </div>
@@ -778,6 +841,8 @@
           <div class="tool-car"><div class="tool-logo css">#</div><strong>CSS / SCSS</strong><span>Styling</span></div>
           <div class="tool-car"><div class="tool-logo test">✓</div><strong>Vitest</strong><span>Testing</span></div>
           <div class="tool-car"><div class="tool-logo mat">M</div><strong>Material</strong><span>UI system</span></div>
+          <div class="tool-car"><div class="tool-logo bs">B</div><strong>Bootstrap</strong><span>UI system</span></div>
+          <div class="tool-car"><div class="tool-logo php">Px</div><strong>Symfony</strong><span>PHP / REST APIs</span></div>
           <div class="tool-car"><div class="tool-logo angular">A</div><strong>Angular</strong><span>5–21</span></div>
           <div class="tool-car"><div class="tool-logo react">⚛</div><strong>React</strong><span>Frontend</span></div>
           <div class="tool-car"><div class="tool-logo ts">TS</div><strong>TypeScript</strong><span>Language</span></div>
@@ -788,8 +853,10 @@
           <div class="tool-car"><div class="tool-logo css">#</div><strong>CSS / SCSS</strong><span>Styling</span></div>
           <div class="tool-car"><div class="tool-logo test">✓</div><strong>Vitest</strong><span>Testing</span></div>
           <div class="tool-car"><div class="tool-logo mat">M</div><strong>Material</strong><span>UI system</span></div>
+          <div class="tool-car"><div class="tool-logo bs">B</div><strong>Bootstrap</strong><span>UI system</span></div>
+          <div class="tool-car"><div class="tool-logo php">Px</div><strong>Symfony</strong><span>PHP / REST APIs</span></div>
         </div>
-        <div class="showroom-caption"><span>TOOLKIT SHOWROOM</span><span>Drag / hover to pause</span></div>
+        <div class="showroom-caption"><span>TOOLKIT SHOWROOM</span><span>Hover to pause</span></div>
       </div>
     </div>
   </section>
@@ -825,12 +892,12 @@
           <h3>Explore the channel</h3>
           <p>
             Watch the storytelling work and creative experiments on
-            YouTube.
+            YouTube — stories, shorts and creative experiments.
           </p>
         </div>
         <a class="btn btn-primary youtube-btn" href="https://www.youtube.com/@ravoyeechandamama257" target="_blank" rel="noopener noreferrer" aria-label="Visit YouTube channel">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg>
-          <span><strong>Visit YouTube</strong><small>Stories · Shorts · Creative work</small></span><b aria-hidden="true">↗</b>
+          Visit YouTube <b aria-hidden="true">↗</b>
         </a>
       </div>
     </div>
@@ -876,24 +943,29 @@
         <p>Turn a feature request into clear user needs, constraints, edge cases and acceptance criteria before implementation begins.</p>
       </div>
 
+      <div class="process-dots" data-process-dots role="tablist" aria-label="Spec-driven development step">
+        <button type="button" class="active" aria-label="Step 1 of 6"></button>
+        <button type="button" aria-label="Step 2 of 6"></button>
+        <button type="button" aria-label="Step 3 of 6"></button>
+        <button type="button" aria-label="Step 4 of 6"></button>
+        <button type="button" aria-label="Step 5 of 6"></button>
+        <button type="button" aria-label="Step 6 of 6"></button>
+      </div>
+
       <div class="cards" style="margin-top:35px;">
         <div class="card">
           <h3>Education</h3>
-          <p>
-            Bachelor of Technology (B.Tech) in Computer Science
-          </p>
-          <p style="margin-top:8px;">
-            Koneru Lakshmaiah Education Foundation
-          </p>
+          <p>Bachelor of Technology, Computer Science</p>
+          <p>Koneru Lakshmaiah Education Foundation · 2020</p>
+          <p>CGPA 7.5 / 10</p>
         </div>
 
         <div class="card">
-          <h3>Engineering beyond code</h3>
-          <p>
-            Code reviews, mentoring, debugging, performance
-            optimization, architecture and cross-functional
-            collaboration.
-          </p>
+          <h3>Recognition at Impelsys</h3>
+          <p>Catalyst Award — 2024</p>
+          <p>SWAT Award — 2023</p>
+          <p>Mission Impossible Award — 2022</p>
+          <p>Best Newcomer Award — 2021</p>
         </div>
       </div>
     </div>
@@ -921,6 +993,12 @@
           talk software — I'd be happy to connect.
         </p>
 
+        <div class="actions">
+          <a class="btn btn-primary" href="assets/resume/ashoks-resume.pdf" target="_blank" rel="noopener noreferrer">
+            Download résumé ↓
+          </a>
+        </div>
+
         <div class="contact-links">
           <a class="contact-link" href="mailto:gogireddyashok10@gmail.com">
             Email ↗
@@ -928,14 +1006,6 @@
 
           <a class="contact-link" href="tel:+917702855128">
             Phone ↗
-          </a>
-
-          <a class="contact-link" href="#">
-            LinkedIn ↗
-          </a>
-
-          <a class="contact-link" href="#">
-            GitHub ↗
           </a>
         </div>
 
@@ -945,11 +1015,11 @@
           </strong>
 
           <p style="margin-top:5px;">
-            Senior Frontend Engineer · Angular · React · TypeScript
+            Senior Software Engineer II · Angular · TypeScript · Enterprise LMS
           </p>
 
           <p style="margin-top:4px;">
-            Currently based in Porto, Portugal
+            Based in Vijayawada, India · worked on site in Porto, Portugal (Jan 2025)
           </p>
         </div>
       </div>
@@ -1055,7 +1125,7 @@
     window.setInterval(showNextFact, 6200);
   }
 
-  // Scene 3: the highlighted milestone advances from the beginning to the present.
+  // Scene 3: the highlighted milestone follows actual scroll position.
   const roadmap = document.querySelector('.roadmap');
   if (roadmap) {
     const milestones = [...roadmap.querySelectorAll('.roadmap-step')];
@@ -1066,10 +1136,35 @@
         item.classList.toggle('is-past', index < milestoneIndex);
       });
       roadmap.dataset.progress = String(milestoneIndex);
-      milestoneIndex = (milestoneIndex + 1) % milestones.length;
     };
+
+    const updateFromScroll = () => {
+      const line = window.innerHeight * .45;
+      let closest = 0;
+      let closestDistance = Infinity;
+      milestones.forEach((item, index) => {
+        const rect = item.getBoundingClientRect();
+        const distance = Math.abs(rect.top + rect.height / 2 - line);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closest = index;
+        }
+      });
+      if (closest !== milestoneIndex) {
+        milestoneIndex = closest;
+        paintMilestone();
+      }
+    };
+
     paintMilestone();
-    window.setInterval(paintMilestone, 3000);
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { updateFromScroll(); ticking = false; });
+    }, {passive:true});
+    window.addEventListener('resize', updateFromScroll);
+    updateFromScroll();
   }
 })();
 </script>
@@ -1078,6 +1173,7 @@
 (() => {
   const detail = document.querySelector('[data-process-detail]');
   const steps = document.querySelectorAll('.process-step');
+  const dots = document.querySelectorAll('[data-process-dots] button');
   const content = {
     requirements: ['01 · REQUIREMENTS','Define what must be true.','Turn a feature request into clear user needs, constraints, edge cases and acceptance criteria before implementation begins.'],
     behavior: ['02 · BEHAVIOR','Describe how the product should respond.','Capture happy paths, empty states, errors, loading states and interaction rules so implementation has less ambiguity.'],
@@ -1086,12 +1182,14 @@
     implementation: ['05 · IMPLEMENTATION','Build from the agreed shape.','Use the specification as a guide for architecture, reusable components, state flow, accessibility and maintainable code.'],
     validation: ['06 · VALIDATION','Prove the result, then refine.','Validate behavior with tests, code review, debugging and real-world checks before considering the work complete.']
   };
-  steps.forEach(step => step.addEventListener('click', () => {
+  steps.forEach((step, index) => step.addEventListener('click', () => {
     steps.forEach(s => s.classList.remove('active'));
     step.classList.add('active');
+    dots.forEach((dot, dotIndex) => dot.classList.toggle('active', dotIndex === index));
     const d = content[step.dataset.step];
     if (detail && d) detail.innerHTML = `<div class="detail-kicker">${d[0]}</div><h3>${d[1]}</h3><p>${d[2]}</p>`;
   }));
+  dots.forEach((dot, index) => dot.addEventListener('click', () => steps[index].click()));
   let autoIndex = 0;
   let autoTimer;
   const advance = () => {

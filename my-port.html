@@ -236,50 +236,124 @@
       margin-top: 25px;
     }
 
-    /* Clapperboard button: the top third is a hinged "clapper stick" that
-       swings open and slams shut on hover / press, like a director's clap. */
+    /* PROJECTOR BUTTONS — iris wipe to ink, letters roll like credits,
+       an icon slides in and film-strip sprockets run along the edges. */
     .btn {
+      --iris: var(--ink);
+      --reveal: var(--gold-light);
+      --expo: cubic-bezier(.7,0,.2,1);
       position: relative;
       isolation: isolate;
+      overflow: hidden;
       border: 0;
       cursor: pointer;
       padding: 13px 22px;
       border-radius: 999px;
       font-weight: 600;
-      perspective: 340px;
-      transition: box-shadow .2s;
+      transition: box-shadow .3s ease, border-color .3s ease;
     }
+
+    .btn.has-icon { padding-left: 28px; padding-right: 28px; }
 
     .btn::before {
       content: "";
       position: absolute;
       z-index: -1;
       inset: 0;
-      border-radius: inherit;
-      background-color: inherit;
-      background-image: linear-gradient(180deg, rgba(255,255,255,.32), rgba(0,0,0,.16));
-      box-shadow: inset 0 -2px 2px rgba(0,0,0,.25);
-      clip-path: inset(0 0 60% 0);
-      transform-origin: bottom center;
-      transform: rotateX(0deg);
+      background: var(--iris);
+      clip-path: circle(0% at 24px 50%);
+      transition: clip-path .5s cubic-bezier(.25,.8,.25,1);
       pointer-events: none;
     }
 
-    .btn:hover {
-      box-shadow: 0 10px 22px rgba(38,49,59,.14);
+    .btn::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      opacity: 0;
+      background-image:
+        linear-gradient(90deg, rgba(255,253,248,.5) 0 6px, transparent 6px),
+        linear-gradient(90deg, rgba(255,253,248,.5) 0 6px, transparent 6px);
+      background-size: 13px 3px;
+      background-repeat: repeat-x;
+      background-position: 0 5px, 0 calc(100% - 5px);
+      transition: opacity .2s ease;
+      pointer-events: none;
     }
 
-    .btn:hover::before,
-    .btn.is-clapping::before {
-      animation: clapperClap .6s cubic-bezier(.3,0,.2,1);
+    .btn-label {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      line-height: 1.3;
+      transition: transform .45s var(--expo);
     }
 
-    @keyframes clapperClap {
-      0%   { transform: rotateX(0deg); }
-      22%  { transform: rotateX(-54deg); }
-      48%  { transform: rotateX(-48deg); }
-      78%  { transform: rotateX(9deg); }
-      100% { transform: rotateX(0deg); }
+    .btn-label .ch {
+      display: inline-block;
+      position: relative;
+      white-space: pre;
+      transition: transform .5s var(--expo) calc((var(--n) - var(--i)) * 18ms);
+    }
+
+    .btn-label .ch::after {
+      content: attr(data-char);
+      position: absolute;
+      left: 0;
+      top: 100%;
+      color: var(--reveal);
+    }
+
+    .btn-icon {
+      position: absolute;
+      left: 9px;
+      top: 50%;
+      width: 28px;
+      height: 28px;
+      margin-top: -14px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--gold);
+      color: var(--ink);
+      transform: translateX(-170%) rotate(-180deg);
+      transition: transform .4s var(--expo);
+      pointer-events: none;
+    }
+
+    .btn-icon svg { width: 13px; height: 13px; }
+
+    .btn:is(:hover, :focus-visible) {
+      box-shadow: 0 12px 28px rgba(38,49,59,.2);
+    }
+
+    .btn:is(:hover, :focus-visible)::before {
+      clip-path: circle(150% at 24px 50%);
+    }
+
+    .btn:is(:hover, :focus-visible)::after {
+      opacity: 1;
+      transition-delay: .3s;
+      animation: filmRun .55s linear infinite;
+    }
+
+    .btn:is(:hover, :focus-visible) .ch {
+      transform: translateY(-100%);
+      transition: transform .45s cubic-bezier(.2,.75,.2,1) calc(var(--i) * 16ms + 70ms);
+    }
+
+    .btn.has-icon:is(:hover, :focus-visible) .btn-label {
+      transform: translateX(16px);
+    }
+
+    .btn:is(:hover, :focus-visible) .btn-icon {
+      transform: none;
+      transition: transform .5s cubic-bezier(.175,.885,.32,1.275) .22s;
+    }
+
+    @keyframes filmRun {
+      to { background-position: 13px 5px, 13px calc(100% - 5px); }
     }
 
     .btn-primary {
@@ -289,8 +363,13 @@
     }
 
     .btn-secondary {
+      --reveal: var(--paper-light);
       background: var(--paper-light);
       border: 1px solid var(--border);
+    }
+
+    .btn-secondary:is(:hover, :focus-visible) {
+      border-color: var(--ink);
     }
 
     /* SCULPTURE */
@@ -526,7 +605,6 @@
     .story-link-card .btn { flex:0 0 auto; }
     .youtube-btn { display:inline-flex; align-items:center; gap:8px; padding:11px 18px!important; font-size:14px; white-space:nowrap; }
     .youtube-btn svg { width:17px; height:17px; flex:0 0 17px; color:#ff2638; }
-    .youtube-btn b { font-size:13px; font-weight:600; }
 
     /* SCENE 6 — ENGINEERING MINDSET ORBIT / SIGNAL FLOW */
     .interactive-process { position:relative; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:14px 0 8px; }
@@ -710,10 +788,8 @@
       </div>
 
       <div class="actions">
-        <a class="btn btn-primary" href="#scene-5">Explore my story →</a>
-        <a class="btn btn-secondary" href="assets/resume/ashoks-resume.pdf" target="_blank" rel="noopener noreferrer">
-          Download résumé
-        </a>
+        <a class="btn btn-primary" href="#scene-5" data-icon="play"><span class="btn-label">Explore my story</span></a>
+        <a class="btn btn-secondary" href="assets/resume/ashoks-resume.pdf" target="_blank" rel="noopener noreferrer" data-icon="download"><span class="btn-label">Download résumé</span></a>
       </div>
     </div>
 
@@ -902,7 +978,7 @@
         </div>
         <a class="btn btn-primary youtube-btn" href="https://www.youtube.com/@ravoyeechandamama257" target="_blank" rel="noopener noreferrer" aria-label="Visit YouTube channel">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg>
-          Visit YouTube <b aria-hidden="true">↗</b>
+          <span class="btn-label">Visit YouTube ↗</span>
         </a>
       </div>
     </div>
@@ -999,9 +1075,7 @@
         </p>
 
         <div class="actions">
-          <a class="btn btn-primary" href="assets/resume/ashoks-resume.pdf" target="_blank" rel="noopener noreferrer">
-            Download résumé ↓
-          </a>
+          <a class="btn btn-primary" href="assets/resume/ashoks-resume.pdf" target="_blank" rel="noopener noreferrer" data-icon="download"><span class="btn-label">Download résumé</span></a>
         </div>
 
         <div class="contact-links">
@@ -1108,15 +1182,36 @@
 
 <script>
 (() => {
-  // Buttons: make the clapperboard clap fire reliably on touch taps too,
-  // since :hover never fires (or sticks) on touch devices.
+  // Buttons: split labels into letters for the credits roll and add icons.
+  const icons = {
+    play: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.5v13l11-6.5z"/></svg>',
+    download: '<svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11m-5-5 5 5 5-5M5 20h14"/></svg>'
+  };
   document.querySelectorAll('.btn').forEach(btn => {
-    btn.addEventListener('pointerdown', () => {
-      btn.classList.remove('is-clapping');
-      void btn.offsetWidth;
-      btn.classList.add('is-clapping');
+    const label = btn.querySelector('.btn-label');
+    if (!label) return;
+    const text = label.textContent.trim();
+    if (!btn.hasAttribute('aria-label')) btn.setAttribute('aria-label', text);
+    label.setAttribute('aria-hidden', 'true');
+    label.style.setProperty('--n', text.length);
+    label.textContent = '';
+    [...text].forEach((char, i) => {
+      const span = document.createElement('span');
+      span.className = 'ch';
+      span.textContent = char;
+      span.dataset.char = char;
+      span.style.setProperty('--i', i);
+      label.appendChild(span);
     });
-    btn.addEventListener('animationend', () => btn.classList.remove('is-clapping'));
+    const icon = icons[btn.dataset.icon];
+    if (icon) {
+      const holder = document.createElement('span');
+      holder.className = 'btn-icon';
+      holder.setAttribute('aria-hidden', 'true');
+      holder.innerHTML = icon;
+      btn.prepend(holder);
+      btn.classList.add('has-icon');
+    }
   });
 })();
 </script>

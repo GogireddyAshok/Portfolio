@@ -236,15 +236,17 @@
       margin-top: 25px;
     }
 
+    /* Clapperboard button: the top third is a hinged "clapper stick" that
+       swings open and slams shut on hover / press, like a director's clap. */
     .btn {
       position: relative;
-      z-index: 0;
+      isolation: isolate;
       border: 0;
       cursor: pointer;
       padding: 13px 22px;
       border-radius: 999px;
       font-weight: 600;
-      perspective: 300px;
+      perspective: 340px;
       transition: box-shadow .2s;
     }
 
@@ -255,10 +257,11 @@
       inset: 0;
       border-radius: inherit;
       background-color: inherit;
-      filter: brightness(1.14);
-      box-shadow: inset 0 -2px 3px rgba(0,0,0,.2);
-      clip-path: inset(0 0 50% 0);
+      background-image: linear-gradient(180deg, rgba(255,255,255,.32), rgba(0,0,0,.16));
+      box-shadow: inset 0 -2px 2px rgba(0,0,0,.25);
+      clip-path: inset(0 0 60% 0);
       transform-origin: bottom center;
+      transform: rotateX(0deg);
       pointer-events: none;
     }
 
@@ -266,14 +269,16 @@
       box-shadow: 0 10px 22px rgba(38,49,59,.14);
     }
 
-    .btn:hover::before {
-      animation: clapperClap .55s cubic-bezier(.3,.8,.3,1);
+    .btn:hover::before,
+    .btn.is-clapping::before {
+      animation: clapperClap .6s cubic-bezier(.3,0,.2,1);
     }
 
     @keyframes clapperClap {
       0%   { transform: rotateX(0deg); }
-      35%  { transform: rotateX(-42deg); }
-      70%  { transform: rotateX(6deg); }
+      22%  { transform: rotateX(-54deg); }
+      48%  { transform: rotateX(-48deg); }
+      78%  { transform: rotateX(9deg); }
       100% { transform: rotateX(0deg); }
     }
 
@@ -464,20 +469,20 @@
 
     /* SCENE 3 — ANIMATED CAREER PATH */
     .roadmap { position:relative; margin-top:30px; padding:8px 0 4px 12px; }
-    .roadmap-line { position:absolute; left:28px; top:24px; bottom:24px; width:3px; border-radius:9px; background:rgba(49,121,166,.12); overflow:hidden; }
+    .roadmap-line { position:absolute; left:41px; top:24px; bottom:24px; width:3px; border-radius:9px; background:rgba(49,121,166,.12); overflow:hidden; z-index:0; }
     .roadmap-line::after { content:""; position:absolute; left:0; top:0; width:100%; height:0%; border-radius:9px; background:linear-gradient(180deg,var(--gold),var(--blue),var(--rose)); box-shadow:0 0 12px rgba(49,121,166,.35); transition:height 1.15s cubic-bezier(.2,.8,.2,1); }
     .roadmap[data-progress="0"] .roadmap-line::after { height:8%; }
     .roadmap[data-progress="1"] .roadmap-line::after { height:34%; }
     .roadmap[data-progress="2"] .roadmap-line::after { height:60%; }
     .roadmap[data-progress="3"] .roadmap-line::after { height:100%; }
     .roadmap-step { position:relative; display:grid; grid-template-columns:58px 1fr; gap:18px; margin-bottom:22px; opacity:.62; transform:translateX(0) scale(.985); transition:opacity .65s ease,transform .65s cubic-bezier(.2,.8,.2,1); }
-    .roadmap-marker { width:16px; height:16px; margin:9px; border-radius:50%; display:grid; place-items:center; position:relative; z-index:2; background:rgba(255,255,255,.12); border:1px solid rgba(49,121,166,.28); color:var(--muted); box-shadow:0 0 0 5px rgba(49,121,166,.025); backdrop-filter:blur(8px); transition:all .6s ease; }
+    .roadmap-marker { width:16px; height:16px; justify-self:center; align-self:start; margin-top:9px; border-radius:50%; display:grid; place-items:center; position:relative; z-index:2; background:var(--paper-light); border:2px solid rgba(49,121,166,.4); color:var(--muted); box-shadow:0 0 0 5px rgba(49,121,166,.025); transition:all .6s ease; }
     .roadmap-marker::after { content:""; position:absolute; inset:-5px; border:1px solid rgba(49,121,166,.38); border-radius:50%; opacity:0; }
     .roadmap-step.is-current { opacity:1; transform:translateX(5px) scale(1); }
     .roadmap-step.is-current .roadmap-marker { background:var(--gold); color:#382812; border-color:var(--gold); box-shadow:0 0 0 6px rgba(233,162,59,.13),0 0 26px rgba(233,162,59,.32); }
     .roadmap-step.is-current .roadmap-marker::after { opacity:1; animation:markerPulse 1.7s ease-out infinite; }
     .roadmap-step.is-past { opacity:.88; }
-    .roadmap-step.is-past .roadmap-marker { background:rgba(49,121,166,.12); color:var(--blue); border-color:rgba(49,121,166,.48); }
+    .roadmap-step.is-past .roadmap-marker { background:var(--blue-light); color:var(--blue); border-color:rgba(49,121,166,.55); }
     .roadmap-card { padding:17px 19px; border:1px solid rgba(255,255,255,.28); border-radius:18px; background:rgba(255,255,255,.07); backdrop-filter:blur(10px); box-shadow:none; transition:transform .5s ease,background .5s ease,box-shadow .5s ease,border-color .5s ease; }
     .roadmap-step.is-current .roadmap-card { transform:translateX(4px); background:linear-gradient(110deg,rgba(233,162,59,.11),rgba(49,121,166,.055),transparent); border-color:rgba(233,162,59,.42); box-shadow:0 14px 32px rgba(38,49,59,.07); }
     .roadmap-step.is-past .roadmap-card { border-color:rgba(49,121,166,.2); }
@@ -610,7 +615,7 @@
       .fact { flex-basis:185px; }
       .roadmap { padding-left:0; }
       .roadmap-step { grid-template-columns:48px 1fr; gap:12px; }
-      .roadmap-line { left:16px; }
+      .roadmap-line { left:24px; }
       .tool-car { width:120px; flex-basis:120px; min-height:140px; }
       .showroom-caption { font-size:9px; }
       .interactive-process { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -1100,6 +1105,21 @@
   }, {passive:true});
 </script>
 
+
+<script>
+(() => {
+  // Buttons: make the clapperboard clap fire reliably on touch taps too,
+  // since :hover never fires (or sticks) on touch devices.
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('pointerdown', () => {
+      btn.classList.remove('is-clapping');
+      void btn.offsetWidth;
+      btn.classList.add('is-clapping');
+    });
+    btn.addEventListener('animationend', () => btn.classList.remove('is-clapping'));
+  });
+})();
+</script>
 
 <script>
 (() => {
